@@ -2,11 +2,15 @@ version: "3"
 services:
   jenkins:
     #container_name: jenkins
-    image: jenkins/jenkins:lts
+    #image: jenkins/jenkins:lts
+    build: jenkins
     ports:
       - 8080:8080
     volumes:
+      - ./:/docker-host/
       - ./jenkins/home:/var/jenkins_home
+    command: /sbin/tini /docker-host/jenkins/boot.sh
+
   app:
     #container_name: app
     build: app
