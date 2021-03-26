@@ -1,27 +1,27 @@
 version: "3"
 services:
   jenkins:
-    #container_name: jenkins
-    #image: jenkins/jenkins:lts
-    build: jenkins
+    build: .docker/jenkins
     ports:
       - 8080:8080
     volumes:
       - ./:/docker-host/
-      - ./jenkins/home:/var/jenkins_home
-    command: /sbin/tini /docker-host/jenkins/boot.sh
+      - ./.docker/jenkins/home:/var/jenkins_home
+    command: /sbin/tini /docker-host/.docker/jenkins/boot.sh
+    depends_on:
+      - db
 
   app:
     #container_name: app
-    build: app
+    build: .docker/app
     ports:
       - 8000:8000
     volumes:
       - ./:/docker-host/
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - ./app/docroot/:/docroot/
+      - ./:/docroot/
       - app-var-lib-mysql:/var/lib/mysql.
-    command: bash -c 'ln -sf .env.dev /docker-host/app/docroot/.env && php artisan serve --host 0.0.0.0'
+    command: bash -c 'ln -sf .env.dev .env && php artisan serve --host 0.0.0.0'
     depends_on:
       - db
 
@@ -37,8 +37,8 @@ services:
       MYSQL_DATABASE: soft806_assignment
     volumes:
       - ./:/docker-host/
-      - ./db/etc/mysql/conf.d/:/etc/mysql/conf.d/
-      - ./db/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
+      - ./.docker/db/etc/mysql/conf.d/:/etc/mysql/conf.d/
+      - ./.docker/db/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
       - db-var-lib-mysql:/var/lib/mysql/
 
 volumes:
