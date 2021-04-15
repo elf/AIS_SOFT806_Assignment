@@ -16,6 +16,7 @@ jobs:
       # for database intensive operations.
       - image: circleci/mysql:8.0-ram
         environment:
+          MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: soft806_assignment_test
           MYSQL_USER: user
           MYSQL_PASSWORD: user
@@ -26,7 +27,7 @@ jobs:
       - checkout
 
       - run: sudo apt update # PHP CircleCI 2.0 Configuration File# PHP CircleCI 2.0 Configuration File sudo apt install zlib1g-dev libsqlite3-dev
-      - run: sudo docker-php-ext-install zip
+      - run: sudo docker-php-ext-install zip pdo_mysql
 
       # Download and cache dependencies
       - restore_cache:
@@ -53,9 +54,9 @@ jobs:
             - node_modules
 
       # prepare the database
-      - run: touch storage/testing.sqlite
-      - run: ln -sf .env.test_circleci .env
-      ##- run: php artisan migrate --force
+      ##- run: touch storage/testing.sqlite
+      - run: ln -sf .env.testing_circleci .env
+      - run: php artisan migrate --force
 
       # run tests with phpunit or codecept
       #- run: ./vendor/bin/phpunit
