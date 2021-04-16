@@ -14,7 +14,7 @@ jobs:
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # Using the RAM variation mitigates I/O contention
       # for database intensive operations.
-      - image: circleci/mysql:8.0
+      - image: circleci/mysql:8.0-ram
         environment:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: soft806_assignment_test
@@ -27,7 +27,7 @@ jobs:
       - checkout
 
       - run: sudo apt update # PHP CircleCI 2.0 Configuration File# PHP CircleCI 2.0 Configuration File sudo apt install zlib1g-dev libsqlite3-dev
-      - run: sudo docker-php-ext-install zip
+      - run: sudo docker-php-ext-install zip pdo_mysql
 
       # Download and cache dependencies
       - restore_cache:
@@ -54,11 +54,43 @@ jobs:
             - node_modules
 
       # prepare the database
-      - run: touch storage/testing.sqlite
-      - run: ln -sf .env.test_circleci .env
-      ##- run: php artisan migrate --force
+      ##- run: touch storage/testing.sqlite
+      - run: ln -sf .env.testing_circleci .env
+      - run: php artisan migrate --force
 
       # run tests with phpunit or codecept
-      #- run: ./vendor/bin/phpunit
+      - run: ./vendor/bin/phpunit
       ## run: ./vendor/bin/codecept build
       ## run: ./vendor/bin/codecept run
+
+  deploy:
+    machine:
+      enabled: true
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "a4:71:57:c1:5b:21:1b:00:08:0e:a0:00:9e:42:d5:78"
+
+      - run:
+          name: Start ssh-keyscan
+          command: |
+            ssh-keyscan ${SSH_HOST} >> ~/.ssh/known_hosts && cat ~/.ssh/known_hosts
+
+      - run:
+          name: Deployment by ssh
+          command: |
+            ssh $SSH_USER@$SSH_HOST "cd ~/workspaces/ais/soft806/$CIRCLE_PROJECT_REPONAME && git pull origin $CIRCLE_BRANCH"
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+
