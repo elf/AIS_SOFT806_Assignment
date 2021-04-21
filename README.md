@@ -5,10 +5,10 @@ To meet the requirements of the assignment, this project will use Docker to prep
 
 * Jenkins
 * Application server and database server
-** PHP
-** MySQL (MariaDB)
+  * PHP
+  * MySQL (MariaDB)
 * PHP application
-** Application with registration and login functionality (using Laravel)
+  * Application with registration and login functionality (using Laravel)
 
 In addition, CircleCI configuration is included.
 
@@ -24,25 +24,27 @@ In addition, CircleCI configuration is included.
 ## How to work
 
 ```
-docker-compose exec app bash
-docker-compose exec db bash
-docker-compose exec jenkins bash
-```
-
-```
 docker-compose up -d --build
 ```
 
-## How to migrate database
+## How to migrate database using Laravel (artisan)
 
 ```
 docker-compose exec app bash -c 'cd /docroot && php artisan migrate'
 ```
 
-## How to know initialAdminPassword
+## How to know initialAdminPassword for Jenkins
 
 ```
 docker-compose exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+```
+
+## How to access to inside of containers using bash
+
+```
+docker-compose exec app bash -l
+docker-compose exec db bash -l
+docker-compose exec jenkins bash -l
 ```
 
 Enjoy!!
