@@ -79,7 +79,7 @@ jobs:
       - run:
           name: Deployment by ssh
           command: |
-            ssh $SSH_USER@$SSH_HOST "cd ~/workspaces/ais/soft806/$CIRCLE_PROJECT_REPONAME && git pull origin $CIRCLE_BRANCH && docker-compose exec app bash -c 'cd /docroot && php artisan migrate'"
+            ssh $SSH_USER@$SSH_HOST "cd ~/workspaces/ais/soft806/$CIRCLE_PROJECT_REPONAME && git pull origin $CIRCLE_BRANCH && docker-compose exec -T app bash -c 'cd /docroot && php artisan migrate'"
 
 workflows:
   version: 2
